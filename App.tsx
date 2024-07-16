@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import Card from "./Components/Card/Card";
 import Draggable from "react-native-draggable";
-import { useState } from "react";
 
 export default function App() {
   const windowWidth = Dimensions.get("window").width / 1.3;
   const windowHeight = Dimensions.get("window").height / 1.15;
+
   return (
     <View>
       <Card />
