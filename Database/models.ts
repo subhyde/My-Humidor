@@ -8,4 +8,5 @@ export type cigarItem = {
   tasteRating: number;
   smokeTime: number;
   review: string;
+  image: string;
 };
