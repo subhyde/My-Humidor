@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { StarRatingDisplay } from "react-native-star-rating-widget";
 
 const Card = () => {
   return (
@@ -12,7 +13,9 @@ const Card = () => {
         />
         <Text style={styles.textXl}>cigar name</Text>
       </View>
-      <Text style={styles.text}>cigar rating</Text>
+      <View style={styles.stars}>
+        <StarRatingDisplay rating={3.5} />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -20,7 +23,10 @@ const Card = () => {
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
-    alignItems: "center", // optional, to align items vertically in the center
+    alignItems: "center",
+  },
+  stars: {
+    alignItems: "center",
   },
   touchable: {
     width: `90%`,
@@ -39,17 +45,9 @@ const styles = StyleSheet.create({
     width: 60,
     borderRadius: 10,
   },
-  flexRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 3,
-  },
   textXl: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#000",
-  },
-  text: {
     color: "#000",
   },
 });
