@@ -14,7 +14,7 @@ const Card = () => {
         <Text style={styles.textXl}>cigar name</Text>
       </View>
       <View style={styles.stars}>
-        <StarRatingDisplay rating={3.5} />
+        <StarRatingDisplay rating={3.3} />
       </View>
     </TouchableOpacity>
   );
