@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
+  Image,
   Button,
   Alert,
 } from "react-native";
@@ -15,16 +16,44 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import StarRating from "react-native-star-rating-widget";
 import Divider from "../Divider/Divider";
+import {
+  createTable,
+  getDBConnection,
+  insertCigarItem,
+} from "../../Database/db-service";
+import { cigarItem } from "../../Database/models";
+import ImgPicker from "../ImgPicker/ImgPicker";
 
 const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFocusedTextArea, setIsFocusedTextArea] = useState(false);
+
+  const [cigarName, setCigarName] = useState("");
+  const [review, setReview] = useState("");
 
   const [drawRating, setDrawRating] = useState(0);
   const [appearanceRating, setAppearanceRating] = useState<number>(0);
   const [burnRating, setBurnRating] = useState<number>(0);
   const [aromaRating, setAromaRating] = useState<number>(0);
   const [tasteRating, setTasteRating] = useState<number>(0);
+
+  const saveReview = async () => {
+    const db = await getDBConnection();
+    await createTable(db);
+    const newItem: cigarItem = {
+      id: Date.now(),
+      cigarName,
+      drawRating,
+      appearanceRating,
+      burnRating,
+      aromaRating,
+      tasteRating,
+      smokeTime: 0,
+      review,
+      image: "",
+    };
+    await insertCigarItem(db, newItem);
+  };
 
   const showConfirmationDialog = () => {
     Alert.alert(
@@ -77,6 +106,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
             </View>
 
             <TextInput
+              onChangeText={setCigarName}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               style={[styles.textInput, isFocused && styles.textInputFocused]}
@@ -118,6 +148,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
               <Text style={styles.label}>Review:</Text>
             </View>
             <TextInput
+              onChangeText={setReview}
               onFocus={() => setIsFocusedTextArea(true)}
               onBlur={() => setIsFocusedTextArea(false)}
               style={[
@@ -129,7 +160,24 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
               numberOfLines={3}
               textAlignVertical="top"
             />
-            <Button title={"save"}></Button>
+            <ImgPicker
+              onImageUpdate={(image) => {
+                // setFieldValue("image", image);
+                // setNewImageAdded(true);
+              }}
+            >
+              <Image
+                alt={"placeholder image"}
+                source={require("../../assets/img.png")}
+                style={{ height: 200, width: 300, borderRadius: 20 }}
+              />
+            </ImgPicker>
+            <Button
+              onPress={() => {
+                saveReview();
+              }}
+              title={"save"}
+            ></Button>
           </ScrollView>
         </View>
       </SafeAreaView>
