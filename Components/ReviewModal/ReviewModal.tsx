@@ -43,7 +43,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
 
     const filename = image.uri.split("/").pop();
     const newPath = FileSystem.documentDirectory + filename;
-
+    //todo error handling when no image is picked
     await FileSystem.copyAsync({
       from: image.uri,
       to: newPath,
