@@ -11,8 +11,9 @@ import {
   Image,
   Button,
   Alert,
+  findNodeHandle,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import StarRating from "react-native-star-rating-widget";
 import Divider from "../Divider/Divider";
@@ -21,6 +22,7 @@ import { cigarItem } from "../../Database/models";
 import ImgPicker from "../ImgPicker/ImgPicker";
 import { useSQLiteContext } from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -65,6 +67,15 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
     props.closeModal();
   };
 
+  const keyboardScrollViewRef = React.useRef<KeyboardAwareScrollView>(null);
+  const handleMessageContentSizeChange = (e: React.Component) => {
+    if (keyboardScrollViewRef.current) {
+      keyboardScrollViewRef.current.scrollToFocusedInput(
+        findNodeHandle(e) || {},
+      );
+    }
+  };
+
   const showConfirmationDialog = () => {
     Alert.alert(
       "Confirm",
@@ -94,13 +105,14 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
     >
       <SafeAreaView style={styles.centeredView}>
         <View style={styles.modalView}>
-          <ScrollView
+          <KeyboardAwareScrollView
             style={{ width: "100%" }}
             contentContainerStyle={{
               alignItems: "center",
               padding: 20,
               paddingTop: 50,
             }}
+            ref={keyboardScrollViewRef}
           >
             <View
               style={{
@@ -159,7 +171,12 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
             </View>
             <TextInput
               onChangeText={setReview}
-              onFocus={() => setIsFocusedTextArea(true)}
+              onFocus={(event: any) => {
+                setIsFocusedTextArea(true);
+              }}
+              onContentSizeChange={(e: { target: React.Component }) =>
+                handleMessageContentSizeChange(e.target)
+              }
               onBlur={() => setIsFocusedTextArea(false)}
               style={[
                 styles.textInput,
@@ -187,7 +204,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
               }}
               title={"save"}
             ></Button>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </View>
       </SafeAreaView>
     </Modal>
