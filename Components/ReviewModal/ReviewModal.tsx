@@ -16,13 +16,11 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import StarRating from "react-native-star-rating-widget";
 import Divider from "../Divider/Divider";
-import {
-  createTable,
-  getDBConnection,
-  insertCigarItem,
-} from "../../Database/db-service";
+import { createTable, insertCigarItem } from "../../Database/db-service";
 import { cigarItem } from "../../Database/models";
 import ImgPicker from "../ImgPicker/ImgPicker";
+import { useSQLiteContext } from "expo-sqlite";
+import * as FileSystem from "expo-file-system";
 
 const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -37,9 +35,20 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
   const [aromaRating, setAromaRating] = useState<number>(0);
   const [tasteRating, setTasteRating] = useState<number>(0);
 
+  const [image, setImage] = useState(require("../../assets/img.png"));
+  const db = useSQLiteContext();
+
   const saveReview = async () => {
-    const db = await getDBConnection();
     await createTable(db);
+
+    const filename = image.uri.split("/").pop();
+    const newPath = FileSystem.documentDirectory + filename;
+
+    await FileSystem.copyAsync({
+      from: image.uri,
+      to: newPath,
+    });
+
     const newItem: cigarItem = {
       id: Date.now(),
       cigarName,
@@ -50,7 +59,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
       tasteRating,
       smokeTime: 0,
       review,
-      image: "",
+      image: newPath,
     };
     await insertCigarItem(db, newItem);
   };
@@ -162,13 +171,12 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
             />
             <ImgPicker
               onImageUpdate={(image) => {
-                // setFieldValue("image", image);
-                // setNewImageAdded(true);
+                setImage({ uri: image });
               }}
             >
               <Image
                 alt={"placeholder image"}
-                source={require("../../assets/img.png")}
+                source={image}
                 style={{ height: 200, width: 300, borderRadius: 20 }}
               />
             </ImgPicker>

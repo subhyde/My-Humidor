@@ -12,6 +12,7 @@
     "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/vector-icons": "^14.0.2",
     "expo": "~51.0.20",
+    "expo-file-system": "^17.0.1",
     "expo-image-picker": "^15.0.7",
     "expo-sqlite": "~14.0.4",
     "expo-status-bar": "~1.12.1",

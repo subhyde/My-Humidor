@@ -1,24 +1,12 @@
 import { cigarItem } from "./models";
 import * as SQLite from "expo-sqlite";
 
-const tableName = "cigarData";
+const tableName = "cigarReviews";
 
-export const getDBConnection = () => {
-  try {
-    return SQLite.openDatabaseAsync("cigar-data.db");
-  } catch (err) {
-    console.error(err);
-    throw new Error("Error opening database");
-  }
-};
-
-export const createTable = (db) => {
-  try {
-    if (!db) {
-      console.error("Database connection is null");
-      throw new Error("Database connection is null");
-    }
-    const query = `CREATE TABLE IF NOT EXISTS ${tableName}(
+export const createTable = async (db: SQLite.SQLiteDatabase) => {
+  await db.execAsync(`
+     PRAGMA journal_mode = WAL;
+     CREATE TABLE IF NOT EXISTS ${tableName}(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         cigarName TEXT NOT NULL,
         drawRating INTEGER,
@@ -28,27 +16,14 @@ export const createTable = (db) => {
         tasteRating INTEGER,
         smokeTime INTEGER,
         review TEXT,
-        image TEXT
-    );`;
-    db.transaction((tx) => {
-      tx.executeSql(
-        query,
-        [],
-        (tx, result) => {
-          console.log("Table created successfully");
-        },
-        (tx, error) => {
-          console.error("Error creating table", error);
-        },
-      );
-    });
-  } catch (err) {
-    console.error(err);
-    throw new Error("Error creating table");
-  }
+        image TEXT);
+  `);
 };
 
-export const insertCigarItem = (db, item) => {
+export const insertCigarItem = async (
+  db: SQLite.SQLiteDatabase,
+  item: cigarItem,
+) => {
   const insertQuery = `INSERT INTO ${tableName} (cigarName, drawRating, appearanceRating, burnRating, aromaRating, tasteRating, smokeTime, review, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const values = [
     item.cigarName,
@@ -61,45 +36,30 @@ export const insertCigarItem = (db, item) => {
     item.review,
     item.image,
   ];
-  console.log(db, " printing db");
-  db.transaction((tx) => {
-    tx.executeSql(
-      insertQuery,
-      values,
-      (tx, result) => {
-        console.log("Item inserted successfully");
-      },
-      (tx, error) => {
-        console.error("Error inserting item", error);
-      },
-    );
-  });
+
+  try {
+    const result = await db.runAsync(insertQuery, values);
+    console.log("Item inserted successfully, ID:", result.lastInsertRowId);
+  } catch (error) {
+    console.error("Error inserting item", error);
+  }
 };
 
-export const fetchRecentCigarItems = (db, limit = 20, offset = 0) => {
+export const fetchRecentCigarItems = async (
+  db: SQLite.SQLiteDatabase,
+  limit = 20,
+  offset = 0,
+) => {
+  const fetchQuery = `SELECT * FROM ${tableName} ORDER BY id DESC LIMIT ? OFFSET ?;`;
+  console.log(
+    `Executing query: ${fetchQuery} with limit: ${limit}, offset: ${offset}`,
+  );
   try {
-    const fetchQuery = `SELECT * FROM ${tableName} ORDER BY id DESC LIMIT ? OFFSET ?;`;
-    return new Promise((resolve, reject) => {
-      db.transaction((tx) => {
-        tx.executeSql(
-          fetchQuery,
-          [limit, offset],
-          (tx, results) => {
-            const items = [];
-            for (let i = 0; i < results.rows.length; i++) {
-              items.push(results.rows.item(i));
-            }
-            resolve(items);
-          },
-          (tx, error) => {
-            console.error("Error fetching items", error);
-            reject(error);
-          },
-        );
-      });
-    });
-  } catch (err) {
-    console.error(err);
+    const items = await db.getAllAsync(fetchQuery, [limit, offset]);
+    console.log("Fetched items:", items);
+    return items;
+  } catch (error) {
+    console.error("Error fetching items", error);
     throw new Error("Error fetching items");
   }
 };
