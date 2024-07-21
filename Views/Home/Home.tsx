@@ -34,7 +34,7 @@ const Home = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <SearchBar />
+      <SearchBar setCigars={(cigars: cigarItem[]) => setCigarItems(cigars)} />
       <FlatList
         data={cigarItems}
         keyExtractor={(item) => item.id.toString()}

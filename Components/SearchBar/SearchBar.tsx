@@ -8,14 +8,23 @@ import {
   Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { searchCigarItemsByName } from "../../Database/db-service";
+import { useSQLiteContext } from "expo-sqlite";
+import { cigarItem } from "../../Database/models";
 
-const SearchBar = () => {
+const SearchBar = (props: { setCigars: (cigars: cigarItem[]) => void }) => {
   const [isFocused, setIsFocused] = useState(false);
-
+  const db = useSQLiteContext();
+  //todo add a debounce
+  const onTextChange = async (text: string) => {
+    const cigars: cigarItem[] = await searchCigarItemsByName(db, text);
+    props.setCigars(cigars);
+  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
         <TextInput
+          onChangeText={onTextChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           style={[styles.textInput, isFocused && styles.textInputFocused]}

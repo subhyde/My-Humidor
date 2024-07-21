@@ -63,3 +63,28 @@ export const fetchRecentCigarItems = async (
     throw new Error("Error fetching items");
   }
 };
+
+export const searchCigarItemsByName = async (
+  db: SQLite.SQLiteDatabase,
+  cigarName: string,
+  limit = 20,
+  offset = 0,
+) => {
+  const searchQuery = `SELECT * FROM ${tableName} WHERE cigarName LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?;`;
+  const searchValue = `%${cigarName}%`;
+  console.log(
+    `Executing query: ${searchQuery} with searchValue: ${searchValue}, limit: ${limit}, offset: ${offset}`,
+  );
+  try {
+    const items = await db.getAllAsync(searchQuery, [
+      searchValue,
+      limit,
+      offset,
+    ]);
+    console.log("Searched items:", items);
+    return items;
+  } catch (error) {
+    console.error("Error searching items", error);
+    throw new Error("Error searching items");
+  }
+};
