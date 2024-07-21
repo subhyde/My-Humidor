@@ -17,14 +17,20 @@ const Home = () => {
 
   const db = useSQLiteContext();
 
+  async function getRecentCigars() {
+    await createTable(db);
+    const cigars: cigarItem[] = await fetchRecentCigarItems(db);
+    setCigarItems(cigars);
+  }
+
   useEffect(() => {
-    async function getRecentCigars() {
-      await createTable(db);
-      const cigars: cigarItem[] = await fetchRecentCigarItems(db);
-      setCigarItems(cigars);
-    }
     getRecentCigars();
   }, []);
+
+  useEffect(() => {
+    //todo better refresh
+    getRecentCigars();
+  }, [modalOpen]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

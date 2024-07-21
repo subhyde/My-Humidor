@@ -62,6 +62,7 @@ const ReviewModal = (props: { isOpen: boolean; closeModal: () => void }) => {
       image: newPath,
     };
     await insertCigarItem(db, newItem);
+    props.closeModal();
   };
 
   const showConfirmationDialog = () => {

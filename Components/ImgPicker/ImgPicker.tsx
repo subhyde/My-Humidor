@@ -15,6 +15,7 @@ const ImgPicker = (props: PhotoActionButtonProps) => {
     if (status === "granted") {
       let result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
         quality: 0.5,
       });
 
