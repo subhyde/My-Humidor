@@ -35,10 +35,14 @@ const Card = (props: { cigarItem: cigarItem }) => {
               uri: props.cigarItem.image,
             }}
           />
-          <Text style={styles.textXl}>{props.cigarItem.cigarName}</Text>
-        </View>
-        <View style={styles.stars}>
-          <StarRatingDisplay rating={calculateAverageRating()} />
+          <View style={styles.innerCard}>
+            <Text style={styles.textXl} numberOfLines={2}>
+              {props.cigarItem.cigarName}
+            </Text>
+            <View style={styles.stars}>
+              <StarRatingDisplay rating={calculateAverageRating()} />
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -63,17 +67,22 @@ const styles = StyleSheet.create({
   content: {
     alignItems: "center",
   },
+  innerCard: {
+    flexShrink: 1,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
+    //paddingRight: 20,
   },
   image: {
-    height: 60,
-    width: 60,
+    height: 100,
+    width: 100,
     borderRadius: 10,
     marginRight: 20,
   },
   stars: {
+    marginLeft: -8,
     marginTop: 10,
   },
   textXl: {
