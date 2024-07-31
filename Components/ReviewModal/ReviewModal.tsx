@@ -170,6 +170,20 @@ const ReviewModal = (props: {
                 <Ionicons name={"close"} size={40} color={"black"} />
               </TouchableOpacity>
             </View>
+            {props.cigarItem && (
+              <View
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: 10,
+                  zIndex: 9999,
+                }}
+              >
+                <TouchableOpacity onPress={showConfirmationDialog}>
+                  <Ionicons name={"create-outline"} size={40} color={"black"} />
+                </TouchableOpacity>
+              </View>
+            )}
             <Divider />
             <TextInput
               onChangeText={setCigarName}
