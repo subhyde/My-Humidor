@@ -2,7 +2,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 import { cigarItem } from "../../Database/models";
 
-const Card = (props: { cigarItem: cigarItem }) => {
+const Card = (props: {
+  cigarItem: cigarItem;
+  openModal: (cigarItem: cigarItem) => void;
+}) => {
   const calculateAverageRating = () => {
     let totalRating = 0;
     let count = 0;
@@ -26,7 +29,10 @@ const Card = (props: { cigarItem: cigarItem }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.touchable}>
+    <TouchableOpacity
+      style={styles.touchable}
+      onPress={() => props.openModal(props.cigarItem)}
+    >
       <View style={styles.content}>
         <View style={styles.row}>
           <Image

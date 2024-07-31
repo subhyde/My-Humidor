@@ -45,6 +45,34 @@ export const insertCigarItem = async (
   }
 };
 
+export const updateCigarItem = async (
+  db: SQLite.SQLiteDatabase,
+  item: cigarItem,
+) => {
+  const updateQuery = `UPDATE ${tableName} SET cigarName = ?, drawRating = ?, appearanceRating = ?, burnRating = ?, aromaRating = ?, tasteRating = ?, smokeTime = ?, review = ?, image = ? WHERE id = ?;`;
+  const values = [
+    item.cigarName,
+    item.drawRating,
+    item.appearanceRating,
+    item.burnRating,
+    item.aromaRating,
+    item.tasteRating,
+    item.smokeTime,
+    item.review,
+    item.image,
+    item.id,
+  ];
+
+  console.log(values);
+
+  try {
+    await db.runAsync(updateQuery, values);
+    console.log("Item updated successfully, ID:", item.id, updateQuery);
+  } catch (error) {
+    console.error("Error updating item", error);
+  }
+};
+
 export const fetchRecentCigarItems = async (
   db: SQLite.SQLiteDatabase,
   limit = 20,
@@ -55,9 +83,7 @@ export const fetchRecentCigarItems = async (
     `Executing query: ${fetchQuery} with limit: ${limit}, offset: ${offset}`,
   );
   try {
-    const items = await db.getAllAsync(fetchQuery, [limit, offset]);
-    console.log("Fetched items:", items);
-    return items;
+    return await db.getAllAsync(fetchQuery, [limit, offset]);
   } catch (error) {
     console.error("Error fetching items", error);
     throw new Error("Error fetching items");
@@ -76,13 +102,7 @@ export const searchCigarItemsByName = async (
     `Executing query: ${searchQuery} with searchValue: ${searchValue}, limit: ${limit}, offset: ${offset}`,
   );
   try {
-    const items = await db.getAllAsync(searchQuery, [
-      searchValue,
-      limit,
-      offset,
-    ]);
-    console.log("Searched items:", items);
-    return items;
+    return await db.getAllAsync(searchQuery, [searchValue, limit, offset]);
   } catch (error) {
     console.error("Error searching items", error);
     throw new Error("Error searching items");

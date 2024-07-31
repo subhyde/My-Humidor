@@ -14,6 +14,8 @@ const Home = () => {
   const windowHeight = Dimensions.get("window").height / 1.15;
   const [modalOpen, setModalOpen] = useState(false);
   const [cigarItems, setCigarItems] = useState<cigarItem[]>([]);
+  const [currentlySelectedCigar, setCurrentlySelectedCigar] =
+    useState<cigarItem | null>(null);
 
   const db = useSQLiteContext();
 
@@ -38,7 +40,15 @@ const Home = () => {
       <FlatList
         data={cigarItems}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Card cigarItem={item} />}
+        renderItem={({ item }) => (
+          <Card
+            cigarItem={item}
+            openModal={(cigarItem) => {
+              setCurrentlySelectedCigar(cigarItem);
+              setModalOpen(true);
+            }}
+          />
+        )}
       />
       <Draggable
         x={windowWidth}
@@ -51,7 +61,16 @@ const Home = () => {
         onShortPressRelease={() => setModalOpen(true)}
       />
       <StatusBar style="auto" />
-      <ReviewModal isOpen={modalOpen} closeModal={() => setModalOpen(false)} />
+      {modalOpen && (
+        <ReviewModal
+          isOpen={modalOpen}
+          closeModal={() => {
+            setCurrentlySelectedCigar(null);
+            setModalOpen(false);
+          }}
+          cigarItem={currentlySelectedCigar}
+        />
+      )}
     </SafeAreaView>
   );
 };
