@@ -7,15 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  ScrollView,
   Image,
   Button,
   Alert,
   findNodeHandle,
 } from "react-native";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import StarRating from "react-native-star-rating-widget";
+import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
 import Divider from "../Divider/Divider";
 import {
   createTable,
@@ -27,6 +26,7 @@ import ImgPicker from "../ImgPicker/ImgPicker";
 import { useSQLiteContext } from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ImageView from "react-native-image-viewing"; // Importing ImageView
 
 const ReviewModal = (props: {
   isOpen: boolean;
@@ -35,17 +35,17 @@ const ReviewModal = (props: {
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFocusedTextArea, setIsFocusedTextArea] = useState(false);
+  const [editable, setEditable] = useState(!props.cigarItem);
 
   const [cigarName, setCigarName] = useState("");
   const [review, setReview] = useState("");
-
   const [drawRating, setDrawRating] = useState(0);
   const [appearanceRating, setAppearanceRating] = useState<number>(0);
   const [burnRating, setBurnRating] = useState<number>(0);
   const [aromaRating, setAromaRating] = useState<number>(0);
   const [tasteRating, setTasteRating] = useState<number>(0);
-
   const [image, setImage] = useState(require("../../assets/img.png"));
+
   const db = useSQLiteContext();
 
   useEffect(() => {
@@ -81,8 +81,8 @@ const ReviewModal = (props: {
     // Check if the image already exists
     const fileInfo = await FileSystem.getInfoAsync(newPath);
     if (!fileInfo.exists) {
+      // todo handle if image is not present
       // Copy the image if it does not exist
-      //todo error handling if image is not uploaded
       await FileSystem.copyAsync({
         from: image.uri,
         to: newPath,
@@ -140,6 +140,18 @@ const ReviewModal = (props: {
     );
   };
 
+  const editReview = () => {
+    setEditable(true);
+  };
+
+  const images = [
+    {
+      uri: image.uri,
+    },
+  ];
+
+  const [visible, setIsVisible] = useState(false);
+
   return (
     <Modal
       visible={props.isOpen}
@@ -170,7 +182,7 @@ const ReviewModal = (props: {
                 <Ionicons name={"close"} size={40} color={"black"} />
               </TouchableOpacity>
             </View>
-            {props.cigarItem && (
+            {props.cigarItem && !editable && (
               <View
                 style={{
                   position: "absolute",
@@ -179,7 +191,7 @@ const ReviewModal = (props: {
                   zIndex: 9999,
                 }}
               >
-                <TouchableOpacity onPress={showConfirmationDialog}>
+                <TouchableOpacity onPress={editReview}>
                   <Ionicons name={"create-outline"} size={40} color={"black"} />
                 </TouchableOpacity>
               </View>
@@ -192,38 +204,55 @@ const ReviewModal = (props: {
               style={[styles.textInput, isFocused && styles.textInputFocused]}
               placeholder="Cigar Name"
               value={cigarName}
+              editable={editable}
             />
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Draw Rating:</Text>
             </View>
-            <StarRating rating={drawRating} onChange={setDrawRating} />
+            {editable ? (
+              <StarRating rating={drawRating} onChange={setDrawRating} />
+            ) : (
+              <StarRatingDisplay rating={drawRating} />
+            )}
             <Divider />
-
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Appearance Rating:</Text>
             </View>
-            <StarRating
-              rating={appearanceRating}
-              onChange={setAppearanceRating}
-            />
+            {editable ? (
+              <StarRating
+                rating={appearanceRating}
+                onChange={setAppearanceRating}
+              />
+            ) : (
+              <StarRatingDisplay rating={appearanceRating} />
+            )}
             <Divider />
-
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Burn Rating:</Text>
             </View>
-            <StarRating rating={burnRating} onChange={setBurnRating} />
+            {editable ? (
+              <StarRating rating={burnRating} onChange={setBurnRating} />
+            ) : (
+              <StarRatingDisplay rating={burnRating} />
+            )}
             <Divider />
-
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Aroma Rating:</Text>
             </View>
-            <StarRating rating={aromaRating} onChange={setAromaRating} />
+            {editable ? (
+              <StarRating rating={aromaRating} onChange={setAromaRating} />
+            ) : (
+              <StarRatingDisplay rating={aromaRating} />
+            )}
             <Divider />
-
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Taste Rating:</Text>
             </View>
-            <StarRating rating={tasteRating} onChange={setTasteRating} />
+            {editable ? (
+              <StarRating rating={tasteRating} onChange={setTasteRating} />
+            ) : (
+              <StarRatingDisplay rating={tasteRating} />
+            )}
             <Divider />
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Review:</Text>
@@ -246,24 +275,43 @@ const ReviewModal = (props: {
               numberOfLines={3}
               textAlignVertical="top"
               value={review}
+              editable={editable}
             />
-            <ImgPicker
-              onImageUpdate={(image) => {
-                setImage({ uri: image });
-              }}
-            >
-              <Image
-                alt={"placeholder image"}
-                source={image}
-                style={{ height: 200, width: 300, borderRadius: 20 }}
+            {editable ? (
+              <ImgPicker
+                onImageUpdate={(image) => {
+                  setImage({ uri: image });
+                }}
+              >
+                <Image
+                  alt={"placeholder image"}
+                  source={image}
+                  style={{ height: 200, width: 300, borderRadius: 20 }}
+                />
+              </ImgPicker>
+            ) : (
+              <TouchableOpacity onPress={() => setIsVisible(true)}>
+                <Image
+                  alt={"placeholder image"}
+                  source={image}
+                  style={{ height: 200, width: 300, borderRadius: 20 }}
+                />
+              </TouchableOpacity>
+            )}
+            <ImageView
+              images={images}
+              imageIndex={0}
+              visible={visible}
+              onRequestClose={() => setIsVisible(false)}
+            />
+            {editable && (
+              <Button
+                onPress={() => {
+                  saveReview();
+                }}
+                title={"save"}
               />
-            </ImgPicker>
-            <Button
-              onPress={() => {
-                saveReview();
-              }}
-              title={"save"}
-            ></Button>
+            )}
           </KeyboardAwareScrollView>
         </View>
       </SafeAreaView>
