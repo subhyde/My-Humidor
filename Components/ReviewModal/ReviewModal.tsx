@@ -121,6 +121,10 @@ const ReviewModal = (props: {
   };
 
   const showConfirmationDialog = () => {
+    if (!editable) {
+      props.closeModal();
+      return;
+    }
     Alert.alert(
       "Confirm",
       "Are you sure you want to leave? Your review wont be saved.",
