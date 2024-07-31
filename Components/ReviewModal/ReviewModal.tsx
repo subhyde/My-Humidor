@@ -18,6 +18,7 @@ import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
 import Divider from "../Divider/Divider";
 import {
   createTable,
+  deleteCigarItem,
   insertCigarItem,
   updateCigarItem,
 } from "../../Database/db-service";
@@ -71,6 +72,33 @@ const ReviewModal = (props: {
       setImage({ uri: image });
     }
   }, [props.cigarItem]);
+
+  const deleteReview = async () => {
+    if (props.cigarItem) {
+      await createTable(db);
+      await deleteCigarItem(db, props.cigarItem.id);
+      props.closeModal();
+    }
+  };
+
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Review",
+      "Are you sure you want to delete this review?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: deleteReview,
+        },
+      ],
+      { cancelable: false },
+    );
+  };
 
   const saveReview = async () => {
     await createTable(db);
@@ -263,7 +291,7 @@ const ReviewModal = (props: {
             </View>
             <TextInput
               onChangeText={setReview}
-              onFocus={(event: any) => {
+              onFocus={() => {
                 setIsFocusedTextArea(true);
               }}
               onContentSizeChange={(e: { target: React.Component }) =>
@@ -313,7 +341,16 @@ const ReviewModal = (props: {
                 onPress={() => {
                   saveReview();
                 }}
-                title={"save"}
+                title={"Save"}
+              />
+            )}
+            {editable && props.cigarItem && (
+              <Button
+                onPress={() => {
+                  confirmDelete();
+                }}
+                title={"Delete"}
+                color={"red"}
               />
             )}
           </KeyboardAwareScrollView>

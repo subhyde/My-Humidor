@@ -90,6 +90,20 @@ export const fetchRecentCigarItems = async (
   }
 };
 
+export const deleteCigarItem = async (
+  db: SQLite.SQLiteDatabase,
+  id: number,
+) => {
+  const deleteQuery = `DELETE FROM ${tableName} WHERE id = ?;`;
+  console.log(`Executing query: ${deleteQuery} with id: ${id}`);
+  try {
+    await db.runAsync(deleteQuery, [id]);
+    console.log("Item deleted successfully, ID:", id);
+  } catch (error) {
+    console.error("Error deleting item", error);
+  }
+};
+
 export const searchCigarItemsByName = async (
   db: SQLite.SQLiteDatabase,
   cigarName: string,
