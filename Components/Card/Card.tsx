@@ -39,7 +39,11 @@ const Card = (props: {
               {props.cigarItem.cigarName}
             </Text>
             <View style={styles.stars}>
-              <StarRatingDisplay rating={calculateAverageRating()} />
+              <StarRatingDisplay
+                maxStars={5}
+                starSize={28}
+                rating={calculateAverageRating()}
+              />
             </View>
           </View>
         </View>
@@ -55,24 +59,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     margin: 20,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 15,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
   },
   content: {
     alignItems: "center",
   },
   innerCard: {
     flexShrink: 1,
+    justifyContent: "center",
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    //paddingRight: 20,
   },
   image: {
     height: 100,
@@ -81,13 +85,15 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   stars: {
-    marginLeft: -8,
     marginTop: 10,
+    alignSelf: "flex-start",
   },
   textXl: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#333333",
+    fontFamily: "HelveticaNeue-Medium",
+    marginBottom: 5,
   },
 });
 
