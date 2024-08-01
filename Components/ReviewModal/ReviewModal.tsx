@@ -337,21 +337,17 @@ const ReviewModal = (props: {
               onRequestClose={() => setIsVisible(false)}
             />
             {editable && (
-              <Button
-                onPress={() => {
-                  saveReview();
-                }}
-                title={"Save"}
-              />
+              <TouchableOpacity onPress={saveReview} style={styles.saveButton}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
             )}
             {editable && props.cigarItem && (
-              <Button
-                onPress={() => {
-                  confirmDelete();
-                }}
-                title={"Delete"}
-                color={"red"}
-              />
+              <TouchableOpacity
+                onPress={confirmDelete}
+                style={styles.deleteButton}
+              >
+                <Text style={styles.buttonText}>Delete</Text>
+              </TouchableOpacity>
             )}
           </KeyboardAwareScrollView>
         </View>
@@ -361,6 +357,55 @@ const ReviewModal = (props: {
 };
 
 const styles = StyleSheet.create({
+  saveButton: {
+    marginTop: 40,
+    backgroundColor: "#4CAF50", // Green color for Save
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    alignItems: "center",
+    marginVertical: 10,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    width: "100%",
+    maxWidth: 300,
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  deleteButton: {
+    backgroundColor: "#FF385C",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    alignItems: "center",
+    marginVertical: 10,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    width: "100%",
+    maxWidth: 300,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
