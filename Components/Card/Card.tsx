@@ -7,9 +7,6 @@ const Card = (props: {
   openModal: (cigarItem: cigarItem) => void;
 }) => {
   const calculateAverageRating = () => {
-    let totalRating = 0;
-    let count = 0;
-
     const ratings = [
       props.cigarItem.drawRating,
       props.cigarItem.appearanceRating,
@@ -18,14 +15,10 @@ const Card = (props: {
       props.cigarItem.tasteRating,
     ];
 
-    ratings.forEach((rating) => {
-      if (rating !== 0) {
-        totalRating += rating;
-        count++;
-      }
-    });
+    const totalRating = ratings.reduce((acc, rating) => acc + rating, 0);
+    const count = ratings.length;
 
-    return count > 0 ? totalRating / count : 0;
+    return totalRating / count;
   };
 
   return (

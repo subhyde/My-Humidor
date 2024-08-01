@@ -1,5 +1,6 @@
 import { cigarItem } from "./models";
 import * as SQLite from "expo-sqlite";
+import { SearchFilter } from "../Components/SearchBar/SearchBar";
 
 const tableName = "cigarReviews";
 
@@ -104,13 +105,33 @@ export const deleteCigarItem = async (
   }
 };
 
-export const searchCigarItemsByName = async (
+export const searchCigarItems = async (
   db: SQLite.SQLiteDatabase,
   cigarName: string,
+  filter: SearchFilter = SearchFilter.Newest,
   limit = 20,
   offset = 0,
 ) => {
-  const searchQuery = `SELECT * FROM ${tableName} WHERE cigarName LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?;`;
+  let orderByClause = "ORDER BY id DESC"; // Default to newest
+
+  switch (filter) {
+    case SearchFilter.Newest:
+      orderByClause = "ORDER BY id DESC";
+      break;
+    case SearchFilter.Oldest:
+      orderByClause = "ORDER BY id ASC";
+      break;
+    case SearchFilter.RatingAscending:
+      orderByClause =
+        "ORDER BY (drawRating + appearanceRating + burnRating + aromaRating + tasteRating) / 5 ASC";
+      break;
+    case SearchFilter.RatingDescending:
+      orderByClause =
+        "ORDER BY (drawRating + appearanceRating + burnRating + aromaRating + tasteRating) / 5 DESC";
+      break;
+  }
+
+  const searchQuery = `SELECT * FROM ${tableName} WHERE cigarName LIKE ? ${orderByClause} LIMIT ? OFFSET ?;`;
   const searchValue = `%${cigarName}%`;
   console.log(
     `Executing query: ${searchQuery} with searchValue: ${searchValue}, limit: ${limit}, offset: ${offset}`,

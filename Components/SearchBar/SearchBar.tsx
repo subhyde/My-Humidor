@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -8,17 +8,41 @@ import {
   Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { searchCigarItemsByName } from "../../Database/db-service";
+import { searchCigarItems } from "../../Database/db-service";
+import RNPickerSelect from "react-native-picker-select";
 import { useSQLiteContext } from "expo-sqlite";
 import { cigarItem } from "../../Database/models";
 
+export enum SearchFilter {
+  Newest = "newest",
+  Oldest = "oldest",
+  RatingAscending = "ratingasc",
+  RatingDescending = "ratingdec",
+}
+
 const SearchBar = (props: { setCigars: (cigars: cigarItem[]) => void }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [filter, setFilter] = useState<SearchFilter>(SearchFilter.Newest);
+  const [searchText, setSearchText] = useState("");
   const db = useSQLiteContext();
-  //todo add a debounce
+
   const onTextChange = async (text: string) => {
-    const cigars: cigarItem[] = await searchCigarItemsByName(db, text);
+    setSearchText(text);
+    const cigars: cigarItem[] = await searchCigarItems(db, text, filter);
     props.setCigars(cigars);
+  };
+
+  const onFilterChange = async () => {
+    const cigars: cigarItem[] = await searchCigarItems(db, searchText, filter);
+    props.setCigars(cigars);
+  };
+
+  const pickerRef = useRef<RNPickerSelect>(null);
+
+  const openPicker = () => {
+    if (pickerRef.current) {
+      pickerRef.current.togglePicker(true);
+    }
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -30,9 +54,27 @@ const SearchBar = (props: { setCigars: (cigars: cigarItem[]) => void }) => {
           style={[styles.textInput, isFocused && styles.textInputFocused]}
           placeholder="Search by name..."
         />
-        <TouchableOpacity>
-          <Ionicons name="filter" size={24} color="black" />
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity onPress={openPicker}>
+            <Ionicons name="filter" size={24} color="black" />
+          </TouchableOpacity>
+          <RNPickerSelect
+            ref={pickerRef}
+            doneText={"Search"}
+            onClose={() => onFilterChange()}
+            onValueChange={(value) => setFilter(value)}
+            items={[
+              { label: "Newest", value: "newest" },
+              { label: "Oldest", value: "oldest" },
+              { label: "Rating Ascending", value: "ratingasc" },
+              { label: "Rating Descending", value: "ratingdec" },
+            ]}
+            style={{
+              inputIOS: { display: "none" },
+              inputAndroid: { display: "none" },
+            }}
+          />
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
