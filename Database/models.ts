@@ -9,4 +9,13 @@ export type cigarItem = {
   smokeTime: number;
   review: string;
   image: string;
+  blend?: string;
+  visualNotes?: string;
+  coldDraw?: string;
+  firstThird?: string;
+  secondThird?: string;
+  lastThird?: string;
+  smokingDuration?: string;
+  construction?: string;
+  formType: "advanced" | "basic";
 };

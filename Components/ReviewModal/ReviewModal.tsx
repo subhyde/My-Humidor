@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Text,
   Image,
-  Button,
   Alert,
   findNodeHandle,
 } from "react-native";
@@ -34,8 +33,8 @@ const ReviewModal = (props: {
   closeModal: () => void;
   cigarItem?: cigarItem | null;
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const [isFocusedTextArea, setIsFocusedTextArea] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
+
   const [editable, setEditable] = useState(!props.cigarItem);
 
   const [cigarName, setCigarName] = useState("");
@@ -46,6 +45,16 @@ const ReviewModal = (props: {
   const [aromaRating, setAromaRating] = useState<number>(0);
   const [tasteRating, setTasteRating] = useState<number>(0);
   const [image, setImage] = useState(require("../../assets/img.png"));
+
+  const [advanced, setAdvanced] = useState(false);
+  const [blend, setBlend] = useState("");
+  const [visualNotes, setVisualNotes] = useState("");
+  const [coldDraw, setColdDraw] = useState("");
+  const [firstThird, setFirstThird] = useState("");
+  const [secondThird, setSecondThird] = useState("");
+  const [lastThird, setLastThird] = useState("");
+  const [smokingDuration, setSmokingDuration] = useState("");
+  const [construction, setConstruction] = useState("");
 
   const db = useSQLiteContext();
 
@@ -60,6 +69,15 @@ const ReviewModal = (props: {
         aromaRating,
         tasteRating,
         image,
+        blend,
+        visualNotes,
+        coldDraw,
+        firstThird,
+        secondThird,
+        lastThird,
+        smokingDuration,
+        construction,
+        formType,
       } = props.cigarItem;
 
       setCigarName(cigarName);
@@ -70,6 +88,15 @@ const ReviewModal = (props: {
       setAromaRating(aromaRating);
       setTasteRating(tasteRating);
       setImage({ uri: image });
+      setBlend(blend || "");
+      setVisualNotes(visualNotes || "");
+      setColdDraw(coldDraw || "");
+      setFirstThird(firstThird || "");
+      setSecondThird(secondThird || "");
+      setLastThird(lastThird || "");
+      setSmokingDuration(smokingDuration || "");
+      setConstruction(construction || "");
+      setAdvanced(formType === "advanced");
     }
   }, [props.cigarItem]);
 
@@ -116,18 +143,42 @@ const ReviewModal = (props: {
         to: newPath,
       });
     }
-
-    const cigarItem: cigarItem = {
-      cigarName,
-      drawRating,
-      appearanceRating,
-      burnRating,
-      aromaRating,
-      tasteRating,
-      smokeTime: 0,
-      review,
-      image: newPath,
-    };
+    let cigarItem: cigarItem;
+    if (advanced) {
+      cigarItem = {
+        formType: "advanced",
+        cigarName,
+        drawRating,
+        appearanceRating,
+        burnRating,
+        aromaRating,
+        tasteRating,
+        smokeTime: 0,
+        review,
+        image: newPath,
+        blend,
+        visualNotes,
+        coldDraw,
+        firstThird,
+        secondThird,
+        lastThird,
+        smokingDuration,
+        construction,
+      };
+    } else {
+      cigarItem = {
+        cigarName,
+        drawRating,
+        appearanceRating,
+        burnRating,
+        aromaRating,
+        tasteRating,
+        smokeTime: 0,
+        review,
+        image: newPath,
+        formType: "basic",
+      };
+    }
 
     if (props.cigarItem) {
       cigarItem.id = props.cigarItem.id;
@@ -228,16 +279,39 @@ const ReviewModal = (props: {
                 </TouchableOpacity>
               </View>
             )}
+            {editable && (
+              <View
+                style={{
+                  position: "absolute",
+                  right: 20,
+                  top: 20,
+                  zIndex: 9999,
+                }}
+              >
+                <TouchableOpacity onPress={() => setAdvanced(!advanced)}>
+                  <Text style={{ fontSize: 16, color: "blue" }}>
+                    {advanced ? "Basic" : "Advanced"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <Divider />
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Cigar Name:</Text>
+            </View>
             <TextInput
               onChangeText={setCigarName}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              style={[styles.textInput, isFocused && styles.textInputFocused]}
+              onFocus={() => setFocusedInput("cigarName")}
+              onBlur={() => setFocusedInput(null)}
+              style={[
+                styles.textInput,
+                focusedInput === "cigarName" && styles.textInputFocused,
+              ]}
               placeholder="Cigar Name"
               value={cigarName}
               editable={editable}
             />
+            <Divider />
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Draw Rating:</Text>
             </View>
@@ -286,21 +360,219 @@ const ReviewModal = (props: {
               <StarRatingDisplay rating={tasteRating} />
             )}
             <Divider />
+            {/*advanced section start*/}
+            {advanced && (
+              <>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Blend:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setBlend}
+                  onFocus={() => {
+                    setFocusedInput("blend");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "blend" && styles.textInputFocused,
+                    { height: 100 },
+                  ]}
+                  multiline
+                  numberOfLines={2}
+                  textAlignVertical="top"
+                  value={blend}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Visual Notes:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setVisualNotes}
+                  onFocus={() => {
+                    setFocusedInput("visualNotes");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "visualNotes" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={visualNotes}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Cold Draw:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setColdDraw}
+                  onFocus={() => {
+                    setFocusedInput("coldDraw");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "coldDraw" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={coldDraw}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>First Third:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setFirstThird}
+                  onFocus={() => {
+                    setFocusedInput("firstThird");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "firstThird" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={firstThird}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Second Third:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setSecondThird}
+                  onFocus={() => {
+                    setFocusedInput("secondThird");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "secondThird" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={secondThird}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Last Third:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setLastThird}
+                  onFocus={() => {
+                    setFocusedInput("lastThird");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "lastThird" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={lastThird}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Construction:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setConstruction}
+                  onFocus={() => {
+                    setFocusedInput("construction");
+                  }}
+                  onContentSizeChange={(e: { target: React.Component }) =>
+                    handleMessageContentSizeChange(e.target)
+                  }
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "construction" && styles.textInputFocused,
+                    { height: 150 },
+                  ]}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                  value={construction}
+                  editable={editable}
+                />
+                <Divider />
+
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Smoke Duration:</Text>
+                </View>
+                <TextInput
+                  onChangeText={setSmokingDuration}
+                  onFocus={() => setFocusedInput("smokeDuration")}
+                  onBlur={() => setFocusedInput(null)}
+                  style={[
+                    styles.textInput,
+                    focusedInput === "smokeDuration" && styles.textInputFocused,
+                  ]}
+                  value={smokingDuration}
+                  editable={editable}
+                />
+                <Divider />
+              </>
+            )}
+
+            {/*advanced section end*/}
+
             <View style={styles.labelContainer}>
               <Text style={styles.label}>Review:</Text>
             </View>
             <TextInput
               onChangeText={setReview}
               onFocus={() => {
-                setIsFocusedTextArea(true);
+                setFocusedInput("review");
               }}
               onContentSizeChange={(e: { target: React.Component }) =>
                 handleMessageContentSizeChange(e.target)
               }
-              onBlur={() => setIsFocusedTextArea(false)}
+              onBlur={() => setFocusedInput(null)}
               style={[
                 styles.textInput,
-                isFocusedTextArea && styles.textInputFocused,
+                focusedInput === "review" && styles.textInputFocused,
                 { height: 150 },
               ]}
               multiline
@@ -309,6 +581,7 @@ const ReviewModal = (props: {
               value={review}
               editable={editable}
             />
+
             {editable ? (
               <ImgPicker
                 onImageUpdate={(image) => {

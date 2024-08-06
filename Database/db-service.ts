@@ -17,7 +17,16 @@ export const createTable = async (db: SQLite.SQLiteDatabase) => {
         tasteRating INTEGER,
         smokeTime INTEGER,
         review TEXT,
-        image TEXT);
+        image TEXT,
+        blend TEXT,
+        visualNotes TEXT,
+        coldDraw TEXT,
+        firstThird TEXT,
+        secondThird TEXT,
+        lastThird TEXT,
+        smokingDuration TEXT,
+        construction TEXT,
+        formType TEXT);
   `);
 };
 
@@ -25,7 +34,7 @@ export const insertCigarItem = async (
   db: SQLite.SQLiteDatabase,
   item: cigarItem,
 ) => {
-  const insertQuery = `INSERT INTO ${tableName} (cigarName, drawRating, appearanceRating, burnRating, aromaRating, tasteRating, smokeTime, review, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  const insertQuery = `INSERT INTO ${tableName} (cigarName, drawRating, appearanceRating, burnRating, aromaRating, tasteRating, smokeTime, review, image, blend, visualNotes, coldDraw, firstThird, secondThird, lastThird, smokingDuration, construction, formType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
   const values = [
     item.cigarName,
     item.drawRating,
@@ -36,6 +45,15 @@ export const insertCigarItem = async (
     item.smokeTime,
     item.review,
     item.image,
+    item.blend,
+    item.visualNotes,
+    item.coldDraw,
+    item.firstThird,
+    item.secondThird,
+    item.lastThird,
+    item.smokingDuration,
+    item.construction,
+    item.formType,
   ];
 
   try {
@@ -50,7 +68,7 @@ export const updateCigarItem = async (
   db: SQLite.SQLiteDatabase,
   item: cigarItem,
 ) => {
-  const updateQuery = `UPDATE ${tableName} SET cigarName = ?, drawRating = ?, appearanceRating = ?, burnRating = ?, aromaRating = ?, tasteRating = ?, smokeTime = ?, review = ?, image = ? WHERE id = ?;`;
+  const updateQuery = `UPDATE ${tableName} SET cigarName = ?, drawRating = ?, appearanceRating = ?, burnRating = ?, aromaRating = ?, tasteRating = ?, smokeTime = ?, review = ?, image = ?, blend = ?, visualNotes = ?, coldDraw = ?, firstThird = ?, secondThird = ?, lastThird = ?, smokingDuration = ?, construction = ?, formType = ? WHERE id = ?;`;
   const values = [
     item.cigarName,
     item.drawRating,
@@ -61,6 +79,15 @@ export const updateCigarItem = async (
     item.smokeTime,
     item.review,
     item.image,
+    item.blend,
+    item.visualNotes,
+    item.coldDraw,
+    item.firstThird,
+    item.secondThird,
+    item.lastThird,
+    item.smokingDuration,
+    item.construction,
+    item.formType,
     item.id,
   ];
 
@@ -74,17 +101,11 @@ export const updateCigarItem = async (
   }
 };
 
-export const fetchRecentCigarItems = async (
-  db: SQLite.SQLiteDatabase,
-  limit = 20,
-  offset = 0,
-) => {
-  const fetchQuery = `SELECT * FROM ${tableName} ORDER BY id DESC LIMIT ? OFFSET ?;`;
-  console.log(
-    `Executing query: ${fetchQuery} with limit: ${limit}, offset: ${offset}`,
-  );
+export const fetchRecentCigarItems = async (db: SQLite.SQLiteDatabase) => {
+  const fetchQuery = `SELECT * FROM ${tableName} ORDER BY id DESC;`;
+  console.log(`Executing query: ${fetchQuery}`);
   try {
-    return await db.getAllAsync(fetchQuery, [limit, offset]);
+    return await db.getAllAsync(fetchQuery);
   } catch (error) {
     console.error("Error fetching items", error);
     throw new Error("Error fetching items");
