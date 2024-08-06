@@ -27,7 +27,7 @@ import ImgPicker from "../ImgPicker/ImgPicker";
 import { useSQLiteContext } from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import ImageView from "react-native-image-viewing"; // Importing ImageView
+import ImageView from "react-native-image-viewing";
 
 const ReviewModal = (props: {
   isOpen: boolean;

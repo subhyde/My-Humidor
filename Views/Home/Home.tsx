@@ -11,7 +11,7 @@ import { cigarItem } from "../../Database/models";
 import { AntDesign } from "@expo/vector-icons";
 
 const Home = () => {
-  const windowWidth = Dimensions.get("window").width / 1.3;
+  const windowWidth = Dimensions.get("window").width / 1.2;
   const windowHeight = Dimensions.get("window").height / 1.15;
   const [modalOpen, setModalOpen] = useState(false);
   const [cigarItems, setCigarItems] = useState<cigarItem[]>([]);

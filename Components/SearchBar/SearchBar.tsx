@@ -83,10 +83,11 @@ const SearchBar = (props: { setCigars: (cigars: cigarItem[]) => void }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    justifyContent: "space-around",
+
     flexDirection: "row",
   },
   textInput: {
-    margin: 20,
     borderStyle: "solid",
     width: "80%",
     borderColor: "#d1d1d1",
