@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "100%",
     maxWidth: 400,
-    borderRadius: 30,
+    borderRadius: 10,
     padding: 10,
     paddingLeft: 20,
     paddingRight: 20,

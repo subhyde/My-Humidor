@@ -130,10 +130,8 @@ export const searchCigarItems = async (
   db: SQLite.SQLiteDatabase,
   cigarName: string,
   filter: SearchFilter = SearchFilter.Newest,
-  limit = 20,
-  offset = 0,
 ) => {
-  let orderByClause = "ORDER BY id DESC"; // Default to newest
+  let orderByClause = "ORDER BY id DESC";
 
   switch (filter) {
     case SearchFilter.Newest:
@@ -155,10 +153,10 @@ export const searchCigarItems = async (
   const searchQuery = `SELECT * FROM ${tableName} WHERE cigarName LIKE ? ${orderByClause} LIMIT ? OFFSET ?;`;
   const searchValue = `%${cigarName}%`;
   console.log(
-    `Executing query: ${searchQuery} with searchValue: ${searchValue}, limit: ${limit}, offset: ${offset}`,
+    `Executing query: ${searchQuery} with searchValue: ${searchValue}`,
   );
   try {
-    return await db.getAllAsync(searchQuery, [searchValue, limit, offset]);
+    return await db.getAllAsync(searchQuery, [searchValue]);
   } catch (error) {
     console.error("Error searching items", error);
     throw new Error("Error searching items");
